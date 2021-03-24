@@ -6,7 +6,7 @@ namespace PhotoLibrary.Business.Interfaces
 {
     public interface IAuthService
     {
-        Task RegisterAsync(RegisterDTO model);
-        Task<SecurityToken> LogInAsync(LogInDTO model);
+        Task RegisterAsync(UserDTO model);
+        Task<SecurityToken> LogInAsync(UserDTO model);
     }
 }

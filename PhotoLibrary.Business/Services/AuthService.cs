@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PhotoLibrary.Business.Exceptions;
@@ -12,8 +13,7 @@ using PhotoLibrary.Business.Interfaces;
 using PhotoLibrary.Business.Models;
 using PhotoLibrary.Data.Entities;
 using PhotoLibrary.Data.Interfaces;
-using AuthenticationException = 
-    PhotoLibrary.Business.Exceptions.AuthenticationException;
+using AuthenticationException = PhotoLibrary.Business.Exceptions.AuthenticationException;
 
 namespace PhotoLibrary.Business.Services
 {
@@ -21,19 +21,18 @@ namespace PhotoLibrary.Business.Services
     {
         private readonly IUnitOfWork _db;
         private readonly IConfiguration _config;
+        private readonly IMapper _mapper;
 
-        public AuthService(IUnitOfWork db, IConfiguration config)
+        public AuthService(IUnitOfWork db, IMapper mapper, IConfiguration config)
         {
             _db = db;
+            _mapper = mapper;
             _config = config;
         }
 
-        public async Task RegisterAsync(RegisterDTO model)
+        public async Task RegisterAsync(UserDTO model)
         {
-            if (model.Password != model.ConfirmPassword)
-                throw new AuthenticationException("Password is different to confirmation password");
-
-            User user = new User {UserName = model.Name, Email = model.Email};
+            var user = _mapper.Map<User>(model);
 
             var result = await _db.UserManager.CreateAsync(user, model.Password);
 
@@ -44,7 +43,7 @@ namespace PhotoLibrary.Business.Services
                         curr.Append(next).Append('\n')).ToString());
         }
 
-        public async Task<SecurityToken> LogInAsync(LogInDTO model)
+        public async Task<SecurityToken> LogInAsync(UserDTO model)
         {
             var user = await _db.UserManager.FindByNameAsync(model.Name) ?? throw new UnauthorizedException();
 

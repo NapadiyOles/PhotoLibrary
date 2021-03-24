@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using PhotoLibrary.Data.Entities;
 
@@ -8,12 +10,14 @@ namespace PhotoLibrary.Data.Interfaces
     {
         IQueryable<T> GetAll();
 
+        IQueryable<Picture> GetMany(Expression<Func<Picture, bool>> expression);
+        
         Task<T> GetByIdAsync(int id);
         
         Task AddAsync(T entity);
         
-        Task UpdateAsync(T entity);
+        void Update(T entity);
         
-        Task DeleteByIdAsync(int id);
+        void DeleteById(int id);
     }
 }

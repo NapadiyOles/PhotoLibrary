@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,11 +25,12 @@ namespace PhotoLibrary.Api
             services.AddCors();
             services.AddControllers();
 
-            var key = Encoding.ASCII.GetBytes(Configuration["JWT:Secret"]);
+            var key = Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]);
             services.AddAuthentication(cfg =>
             {
                 cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(opt =>
             {
                 opt.RequireHttpsMetadata = false;
@@ -38,7 +40,8 @@ namespace PhotoLibrary.Api
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
             

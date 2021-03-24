@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Identity;
 using PhotoLibrary.Data.Entities;
+using PhotoLibrary.Data.Repositories;
 
 namespace PhotoLibrary.Data.Interfaces
 {
@@ -8,5 +9,6 @@ namespace PhotoLibrary.Data.Interfaces
     {
         UserManager<User> UserManager { get; }
         RoleManager<IdentityRole> RoleManager { get; }
+        PictureRepository PictureRepository { get; }
     }
 }

@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="10.1.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.4" />
       <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
@@ -15,10 +16,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\PhotoLibrary.Data\PhotoLibrary.Data.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Profiles" />
     </ItemGroup>
 
 </Project>

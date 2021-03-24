@@ -14,7 +14,7 @@ namespace PhotoLibrary.Api.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthService _service;
@@ -26,12 +26,11 @@ namespace PhotoLibrary.Api.Controllers
         {
             try
             {
-                await _service.RegisterAsync(new RegisterDTO()
+                await _service.RegisterAsync(new UserDTO
                 {
                     Name = model.Name,
                     Email = model.Email,
                     Password = model.Password,
-                    ConfirmPassword = model.ConfirmPassword
                 });
             }
             catch (AuthenticationException e)
@@ -50,7 +49,7 @@ namespace PhotoLibrary.Api.Controllers
 
             try
             {
-                token = await _service.LogInAsync(new LogInDTO
+                token = await _service.LogInAsync(new UserDTO
                 {
                     Name = model.Name, Password = model.Password
                 });
@@ -72,10 +71,9 @@ namespace PhotoLibrary.Api.Controllers
         }
 
         [HttpGet("hi")]
-        [Authorize]
         public ActionResult MakeHi()
         {
-            var user = User;
+            var user = User.Identity.Name;
             
                 return Ok("hi!");
             
