@@ -1,9 +1,8 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using PhotoLibrary.Api.Models;
+using PhotoLibrary.Api.Models.User;
 using PhotoLibrary.Business.Exceptions;
 using PhotoLibrary.Business.Interfaces;
 using PhotoLibrary.Business.Models;
@@ -14,13 +13,12 @@ namespace PhotoLibrary.Api.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [AllowAnonymous]
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthService _service;
         public AuthenticationController(IAuthService service) => _service = service;
 
-        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult> Register(UserRegisterModel model)
         {
@@ -35,26 +33,28 @@ namespace PhotoLibrary.Api.Controllers
             }
             catch (AuthenticationException e)
             {
-                return BadRequest(e.Message);
+                List<string> exceptions = new List<string>();
+                foreach (var exception in e.InnerExceptions)
+                    exceptions.Add(exception.Message);
+
+                return BadRequest(exceptions);
             }
 
             return Ok();
         }
 
-        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult> LogIn(UserLoginModel model)
         {
-            SecurityToken token;
-
-            try
+            LibraryToken token;
+            try 
             {
                 token = await _service.LogInAsync(new UserDTO
                 {
                     Name = model.Name, Password = model.Password
                 });
             }
-            catch (UnauthorizedException)
+            catch (UnregisteredException)
             {
                 return Unauthorized();
             }
@@ -62,29 +62,8 @@ namespace PhotoLibrary.Api.Controllers
             {
                 return BadRequest(e.Message);
             }
-
-            return Ok(new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
-            });
-        }
-
-        [HttpGet("hi")]
-        public ActionResult MakeHi()
-        {
-            var user = User.Identity.Name;
             
-                return Ok("hi!");
-            
-            // return Forbid();
-        }
-
-        [AllowAnonymous]
-        [HttpGet("non-auth_hi")]
-        public ActionResult SayHi()
-        {
-            return Ok("non auth hi");
+            return Ok(token);
         }
     }
 }

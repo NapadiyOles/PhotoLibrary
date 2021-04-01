@@ -17,6 +17,8 @@ namespace PhotoLibrary.Data
                 .HasMany(u => u.Pictures)
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<Picture>().Ignore(p => p.Image);
         }
     }
 }

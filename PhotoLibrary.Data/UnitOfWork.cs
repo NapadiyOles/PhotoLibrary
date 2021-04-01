@@ -10,7 +10,7 @@ namespace PhotoLibrary.Data
     public class UnitOfWork : IUnitOfWork
     {
         private bool _disposed;
-        private AppDbContext _context;
+        private readonly AppDbContext _context;
         private PictureRepository _pictureRepository;
 
         public UnitOfWork(AppDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)

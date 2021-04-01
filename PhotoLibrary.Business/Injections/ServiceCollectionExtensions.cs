@@ -17,6 +17,8 @@ namespace PhotoLibrary.Business.Injections
                 cfg.AddProfile<MappingProfile>())));
 
             services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IPictureService, PictureService>();
         }
     }
 }

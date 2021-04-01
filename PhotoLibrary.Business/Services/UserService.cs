@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using PhotoLibrary.Business.Exceptions;
 using PhotoLibrary.Business.Interfaces;
 using PhotoLibrary.Business.Models;
+using PhotoLibrary.Data.Entities;
 using PhotoLibrary.Data.Interfaces;
 
 namespace PhotoLibrary.Business.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        public readonly IUnitOfWork _db;
-        public readonly IMapper _mapper;
+        private readonly IUnitOfWork _db;
+        private readonly IMapper _mapper;
 
         public UserService(IUnitOfWork db, IMapper mapper)
         {
@@ -32,20 +33,23 @@ namespace PhotoLibrary.Business.Services
 
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
+
+        public async Task CreateAdmin(UserDTO model)
+        {
+            var user = _mapper.Map<User>(model);
+            var result = await _db.UserManager.CreateAsync(user);
+            
+            if (!result.Succeeded)
+                throw new AuthenticationException(result.Errors
+                    .Select(e => new IdentityException(e.Description)));
+
+            await _db.UserManager.AddToRolesAsync(user, new[] {RoleTypes.User, RoleTypes.Admin});
+        }
         
-        public async Task AddAsync(UserDTO model)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public async Task UpdateAsync(UserDTO model)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public async Task DeleteByIdAsync(UserDTO model)
         {
-            throw new NotImplementedException();
+            var user = _mapper.Map<User>(model);
+            await _db.UserManager.DeleteAsync(user);
         }
     }
 }

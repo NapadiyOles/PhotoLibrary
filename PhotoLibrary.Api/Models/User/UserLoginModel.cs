@@ -1,4 +1,4 @@
-﻿namespace PhotoLibrary.Api.Models
+﻿namespace PhotoLibrary.Api.Models.User
 {
     public class UserLoginModel
     {

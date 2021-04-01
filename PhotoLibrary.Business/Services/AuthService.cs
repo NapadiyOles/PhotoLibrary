@@ -23,6 +23,9 @@ namespace PhotoLibrary.Business.Services
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Handles user authentication
+        /// </summary>
         public AuthService(IUnitOfWork db, IMapper mapper, IConfiguration config)
         {
             _db = db;
@@ -30,22 +33,34 @@ namespace PhotoLibrary.Business.Services
             _config = config;
         }
 
+        /// <summary>
+        /// Adds new users to database
+        /// </summary>
+        /// <param name="model">Contains user credentials</param>
+        /// <exception cref="AuthenticationException">Throws when registration is failed</exception>
         public async Task RegisterAsync(UserDTO model)
         {
             var user = _mapper.Map<User>(model);
-
+            
             var result = await _db.UserManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
                 throw new AuthenticationException(result.Errors
-                    .Select(er => $"Code: {er.Code}; Description: {er.Description}")
-                    .Aggregate(new StringBuilder(), (curr, next) => 
-                        curr.Append(next).Append('\n')).ToString());
+                    .Select(e => new IdentityException(e.Description)));
+
+            await _db.UserManager.AddToRoleAsync(user, RoleTypes.User);
         }
 
-        public async Task<SecurityToken> LogInAsync(UserDTO model)
+        /// <summary>
+        /// Gives an authorization token for preregistered users
+        /// </summary>
+        /// <param name="model">Contains user credentials</param>
+        /// <returns>Authorization token</returns>
+        /// <exception cref="UnregisteredException">Throws when user in not registered</exception>
+        /// <exception cref="AuthenticationException">Throws when user credentials is invalid</exception>
+        public async Task<LibraryToken> LogInAsync(UserDTO model)
         {
-            var user = await _db.UserManager.FindByNameAsync(model.Name) ?? throw new UnauthorizedException();
+            var user = await _db.UserManager.FindByNameAsync(model.Name) ?? throw new UnregisteredException();
 
             if (!await _db.UserManager.CheckPasswordAsync(user, model.Password))
                 throw new AuthenticationException("Password is not correct");
@@ -54,7 +69,7 @@ namespace PhotoLibrary.Business.Services
 
             var authClaims = new List<Claim>
             {
-                new (ClaimTypes.Name, user.UserName),
+                new (ClaimTypes.Name, user.Id),
                 new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -74,7 +89,8 @@ namespace PhotoLibrary.Business.Services
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return token;
+            return new LibraryToken
+                {Token = new JwtSecurityTokenHandler().WriteToken(token), Expiration = token.ValidTo};
         }
     }
 }

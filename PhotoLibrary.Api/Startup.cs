@@ -24,6 +24,8 @@ namespace PhotoLibrary.Api
         {
             services.AddCors();
             services.AddControllers();
+            
+            services.AddBusinessServices(Configuration.GetConnectionString("PhotoLibraryDb"));
 
             var key = Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]);
             services.AddAuthentication(cfg =>
@@ -45,8 +47,6 @@ namespace PhotoLibrary.Api
                 };
             });
             
-            services.AddBusinessServices(Configuration.GetConnectionString("PhotoLibraryDb"));
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "PhotoLibrary.Api", Version = "v1"});
@@ -66,10 +66,10 @@ namespace PhotoLibrary.Api
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
-
             app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+            app.UseRouting();
+            
             app.UseAuthentication();
 
             app.UseAuthorization();

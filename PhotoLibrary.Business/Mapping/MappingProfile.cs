@@ -8,10 +8,12 @@ namespace PhotoLibrary.Business.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<User, UserDTO>()
-                .ForMember(d => d.Name,
-                    opt => opt.MapFrom(s => s.UserName))
-                .ReverseMap();
+            CreateMap<UserDTO, User>().ConvertUsing<UserConverter>();
+
+            CreateMap<User, UserDTO>().ForMember(d => d.Name,
+                opt => opt.MapFrom(s => s.UserName));
+            
+            CreateMap<PictureDTO, Picture>().ReverseMap();
         }
     }
 }
