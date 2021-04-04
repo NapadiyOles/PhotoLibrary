@@ -9,7 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PhotoLibrary.Api.Filters;
+using PhotoLibrary.Api.Mapping;
 using PhotoLibrary.Business.Injections;
+using PhotoLibrary.Business.Mapping;
 
 namespace PhotoLibrary.Api
 {
@@ -24,6 +27,12 @@ namespace PhotoLibrary.Api
         {
             services.AddCors();
             services.AddControllers();
+
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<BusinessMappingProfile>();
+                cfg.AddProfile<ApiMappingProfile>();
+            });
             
             services.AddBusinessServices(Configuration.GetConnectionString("PhotoLibraryDb"));
 
@@ -46,6 +55,10 @@ namespace PhotoLibrary.Api
                     ClockSkew = TimeSpan.Zero
                 };
             });
+
+            services.AddScoped<AuthenticationExceptionFilter>();
+            services.AddScoped<PictureExceptionFilter>();
+            services.AddScoped<UserExceptionFilter>();
             
             services.AddSwaggerGen(c =>
             {

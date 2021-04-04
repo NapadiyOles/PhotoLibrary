@@ -19,6 +19,8 @@ namespace PhotoLibrary.Data
             _context = context;
             UserManager = userManager;
             RoleManager = roleManager;
+
+            IdentityDataSeeder.Seed(userManager, roleManager);
         }
 
         public UserManager<User> UserManager { get; }

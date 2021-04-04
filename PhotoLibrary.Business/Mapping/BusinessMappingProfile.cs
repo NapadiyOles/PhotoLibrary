@@ -4,9 +4,9 @@ using PhotoLibrary.Data.Entities;
 
 namespace PhotoLibrary.Business.Mapping
 {
-    public class MappingProfile : Profile
+    public class BusinessMappingProfile : Profile
     {
-        public MappingProfile()
+        public BusinessMappingProfile()
         {
             CreateMap<UserDTO, User>().ConvertUsing<UserConverter>();
 

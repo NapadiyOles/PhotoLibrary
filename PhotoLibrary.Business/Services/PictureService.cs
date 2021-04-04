@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using AutoMapper;
+using PhotoLibrary.Business.Exceptions;
 using PhotoLibrary.Business.Interfaces;
 using PhotoLibrary.Business.Models;
 using PhotoLibrary.Data.Entities;
@@ -56,7 +57,7 @@ namespace PhotoLibrary.Business.Services
             await _db.SaveAsync();
         }
 
-        public async Task ChangeNameAsync(int id, string name)
+        public async Task ChangeNameAsync(int id, string name, string userId)
         {
             if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id), "Value must be positive");
 
@@ -64,6 +65,9 @@ namespace PhotoLibrary.Business.Services
                 throw new ArgumentException("Value can't be null or empty", nameof(name));
 
             var picture = await _db.PictureRepository.GetByIdAsync(id);
+
+            if (picture.UserId == userId) throw new IdentityException("Only picture author can change the name");
+            
             picture.Name = name;
             _db.PictureRepository.Update(picture);
             await _db.SaveAsync();

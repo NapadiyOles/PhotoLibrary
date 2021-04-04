@@ -16,6 +16,7 @@ namespace PhotoLibrary.Data
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Pictures)
                 .WithOne(p => p.User)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey(p => p.UserId);
 
             modelBuilder.Entity<Picture>().Ignore(p => p.Image);

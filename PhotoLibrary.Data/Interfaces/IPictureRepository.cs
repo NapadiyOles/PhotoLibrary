@@ -10,9 +10,11 @@ namespace PhotoLibrary.Data.Interfaces
     {
         Task<IEnumerable<Picture>> GetAllAsync();
         Task<IEnumerable<Picture>> GetManyAsync(Expression<Func<Picture, bool>> expression);
+        Task<IEnumerable<string>> GetIds(Expression<Func<Picture, bool>> expression);
         Task<Picture> GetByIdAsync(int id);
         Task AddAsync(Picture entity);
         void Update(Picture entity);
         void Delete(int id, string uniqueId);
+        void DeleteMany(IEnumerable<string> uniqueIds);
     }
 }

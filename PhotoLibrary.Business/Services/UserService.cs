@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -27,28 +28,45 @@ namespace PhotoLibrary.Business.Services
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
         
-        public async Task<IEnumerable<UserDTO>> GetAllByRole(string type)
+        public async Task AddUserToAdminRoleAsync(string id)
         {
-            var users = await _db.UserManager.GetUsersInRoleAsync(type);
+            User user = await _db.UserManager.FindByIdAsync(id)
+                        ?? throw new ArgumentNullException(nameof(user));
 
-            return _mapper.Map<IEnumerable<UserDTO>>(users);
-        }
+            var result = await _db.UserManager.AddToRoleAsync(user, RoleTypes.Admin);
 
-        public async Task CreateAdmin(UserDTO model)
-        {
-            var user = _mapper.Map<User>(model);
-            var result = await _db.UserManager.CreateAsync(user);
-            
             if (!result.Succeeded)
                 throw new AuthenticationException(result.Errors
                     .Select(e => new IdentityException(e.Description)));
+        }
 
-            await _db.UserManager.AddToRolesAsync(user, new[] {RoleTypes.User, RoleTypes.Admin});
+        public async Task DeleteUserFromAdminRoleAsync(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException("Value can't be null or empty", nameof(id));
+
+            User user = await _db.UserManager.FindByIdAsync(id)
+                        ?? throw new ArgumentNullException(nameof(user));
+
+            var result = await _db.UserManager.RemoveFromRoleAsync(user, RoleTypes.Admin);
+
+            if (!result.Succeeded)
+                throw new AuthenticationException(result.Errors
+                    .Select(e => new IdentityException(e.Description)));
         }
         
-        public async Task DeleteByIdAsync(UserDTO model)
+        public async Task DeleteByIdAsync(string id)
         {
-            var user = _mapper.Map<User>(model);
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException("Value can't be null or empty", nameof(id));
+
+            User user = await _db.UserManager.FindByIdAsync(id) ?? 
+                        throw new ArgumentNullException(nameof(user));
+
+            var pictureIds =  await _db.PictureRepository.GetIds(p => p.UserId == user.Id);
+
+            _db.PictureRepository.DeleteMany(pictureIds);
+
             await _db.UserManager.DeleteAsync(user);
         }
     }
