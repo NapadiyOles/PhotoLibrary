@@ -7,19 +7,19 @@ namespace PhotoLibrary.Api.Filters
 {
     public class UserExceptionFilter : ExceptionFilterAttribute
     {
-        private object _error;
-
         public override void OnException(ExceptionContext context)
         {
-            _error = context.Exception switch
+            context.Result = context.Exception switch
             {
-                ArgumentNullException => context.Exception.Message,
-                AuthenticationException => context.Exception.Message,
-                ArgumentException => context.Exception.Message,
-                _ => "Unhandled error occured. " + context.Exception.Message
+                ArgumentNullException => new NotFoundObjectResult(context.Exception.Message),
+                AuthenticationException => new BadRequestObjectResult(context.Exception.Message),
+                ArgumentException => new BadRequestObjectResult(context.Exception.Message),
+#if DEBUG
+                _ => new BadRequestObjectResult(
+                    $"Unhandled error occured. {context.Exception}: {context.Exception.Message}")
+#endif
             };
             
-            context.Result = new BadRequestObjectResult(_error);
             base.OnException(context);
         }
     }

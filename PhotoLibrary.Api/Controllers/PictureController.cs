@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhotoLibrary.Api.Filters;
 using PhotoLibrary.Api.Models.Picture;
-using PhotoLibrary.Business.Exceptions;
 using PhotoLibrary.Business.Interfaces;
 using PhotoLibrary.Business.Models;
 

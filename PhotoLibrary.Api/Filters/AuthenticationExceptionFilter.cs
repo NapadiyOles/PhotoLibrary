@@ -6,18 +6,18 @@ namespace PhotoLibrary.Api.Filters
 {
     public class AuthenticationExceptionFilter : ExceptionFilterAttribute
     {
-        private object _error;
-        
         public override void OnException(ExceptionContext context)
         {
-            _error = context.Exception switch
+            context.Result = context.Exception switch
             {
-                AuthenticationException => context.Exception.Message,
-                UnregisteredException => context.Exception.Message,
-                _ => "Unhandled error occured. " + context.Exception.Message
+                AuthenticationException => new BadRequestObjectResult(context.Exception.Message),
+                UnregisteredException => new BadRequestObjectResult(context.Exception.Message),
+#if DEBUG
+                _ => new BadRequestObjectResult(
+                    $"Unhandled error occured. {context.Exception}: {context.Exception.Message}")
+#endif
             };
             
-            context.Result = new BadRequestObjectResult(_error);
             base.OnException(context);
         }
     }

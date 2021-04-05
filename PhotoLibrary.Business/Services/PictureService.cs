@@ -98,7 +98,7 @@ namespace PhotoLibrary.Business.Services
 
             if (string.IsNullOrEmpty(model.UniqueId))
                 throw new ArgumentException("Value of uniqueId field can't be null or empty", nameof(model));
-            
+
             _db.PictureRepository.Delete(model.Id, model.UniqueId);
             await _db.SaveAsync();
         }

@@ -1,26 +1,29 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using PhotoLibrary.Business.Exceptions;
 
 namespace PhotoLibrary.Api.Filters
 {
     public class PictureExceptionFilter : ExceptionFilterAttribute
     {
-        private object _error;
-        
         public override void OnException(ExceptionContext context)
         {
-            _error = context.Exception switch
+            context.Result = context.Exception switch
             {
-                ArgumentOutOfRangeException => context.Exception.Message,
-                ArgumentNullException => context.Exception.Message,
-                ArgumentException => context.Exception.Message,
-                IdentityException => context.Exception.Message,
-                _ => "Unhandled error occured. " + context.Exception.Message
+                ArgumentOutOfRangeException => new BadRequestObjectResult(context.Exception.Message),
+                ArgumentNullException => new BadRequestObjectResult(context.Exception.Message),
+                ArgumentException => new BadRequestObjectResult(context.Exception.Message),
+                IdentityException => new BadRequestObjectResult(context.Exception.Message),
+                NullReferenceException => new NotFoundObjectResult(context.Exception.Message),
+                DbUpdateConcurrencyException => new NotFoundObjectResult(context.Exception.Message),
+#if DEBUG
+                _ => new BadRequestObjectResult(
+                    $"Unhandled error occured. {context.Exception}: {context.Exception.Message}")
+#endif
             };
             
-            context.Result = new BadRequestObjectResult(_error);
             base.OnException(context);
         }
     }
