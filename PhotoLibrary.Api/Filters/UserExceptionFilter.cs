@@ -5,6 +5,9 @@ using PhotoLibrary.Business.Exceptions;
 
 namespace PhotoLibrary.Api.Filters
 {
+    /// <summary>
+    /// Filters exceptions from User controller
+    /// </summary>
     public class UserExceptionFilter : ExceptionFilterAttribute
     {
         public override void OnException(ExceptionContext context)

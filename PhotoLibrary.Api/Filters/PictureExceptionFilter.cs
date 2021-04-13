@@ -6,6 +6,9 @@ using PhotoLibrary.Business.Exceptions;
 
 namespace PhotoLibrary.Api.Filters
 {
+    /// <summary>
+    /// Filters exceptions from Picture controller
+    /// </summary>
     public class PictureExceptionFilter : ExceptionFilterAttribute
     {
         public override void OnException(ExceptionContext context)

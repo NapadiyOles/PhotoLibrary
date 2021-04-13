@@ -17,15 +17,15 @@ using AuthenticationException = PhotoLibrary.Business.Exceptions.AuthenticationE
 
 namespace PhotoLibrary.Business.Services
 {
+    /// <summary>
+    /// Provides user authentication
+    /// </summary>
     public class AuthService : IAuthService
     {
         private readonly IUnitOfWork _db;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
-        /// <summary>
-        /// Handles user authentication
-        /// </summary>
         public AuthService(IUnitOfWork db, IMapper mapper, IConfiguration config)
         {
             _db = db;

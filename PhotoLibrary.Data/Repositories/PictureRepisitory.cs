@@ -20,8 +20,8 @@ namespace PhotoLibrary.Data.Repositories
 
         public async Task<IEnumerable<Picture>> GetAllAsync()
         {
-            var pictures = await GetAll().ToListAsync();
-            return pictures;
+            var pictures = GetAll();
+            return await pictures.ToListAsync();
         }
         
         public async Task<IEnumerable<Picture>> GetManyAsync(Expression<Func<Picture, bool>> expression)
